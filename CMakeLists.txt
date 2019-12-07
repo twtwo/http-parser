@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.5.0 FATAL_ERROR)
+
+project(http-parser)
+
+set(INSTALL_HTTP_PARSER_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
+set(INSTALL_HTTP_PARSER_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "Installation directory for headers")
+
+set(HTTP_PARSER_LIBRARY http-parser)
+
+set(HTTP_PARSER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/http_parser.c
+)
+
+add_library(${HTTP_PARSER_LIBRARY} STATIC ${HTTP_PARSER_FILES})
+
+set(HTTP_PARSER_PUBLIC_H ${CMAKE_CURRENT_SOURCE_DIR}/http_parser.h )
+
+install(FILES ${HTTP_PARSER_PUBLIC_H} DESTINATION "${INSTALL_HTTP_PARSER_INCLUDE_DIR}")
+install(TARGETS ${HTTP_PARSER_LIBRARY} DESTINATION "${INSTALL_HTTP_PARSER_LIB_DIR}")
