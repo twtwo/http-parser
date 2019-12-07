@@ -4184,6 +4184,13 @@ main (void)
 
   test_simple_type(
       "POST / HTTP/1.1\r\n"
+      "Content-Length:\r\n"  // empty
+      "\r\n",
+      HPE_INVALID_CONTENT_LENGTH,
+      HTTP_REQUEST);
+
+  test_simple_type(
+      "POST / HTTP/1.1\r\n"
       "Content-Length:  42 \r\n"  // Note the surrounding whitespace.
       "\r\n",
       HPE_OK,
@@ -4201,6 +4208,20 @@ main (void)
       "Content-Length: 13 37\r\n"
       "\r\n",
       HPE_INVALID_CONTENT_LENGTH,
+      HTTP_REQUEST);
+
+  test_simple_type(
+      "POST / HTTP/1.1\r\n"
+      "Content-Length:  42\r\n"
+      " Hello world!\r\n",
+      HPE_INVALID_CONTENT_LENGTH,
+      HTTP_REQUEST);
+
+  test_simple_type(
+      "POST / HTTP/1.1\r\n"
+      "Content-Length:  42\r\n"
+      " \r\n",
+      HPE_OK,
       HTTP_REQUEST);
 
   //// RESPONSES
@@ -4294,6 +4315,9 @@ main (void)
   test_simple("GET / HTTP/01.1\r\n\r\n", HPE_INVALID_VERSION);
   test_simple("GET / HTTP/11.1\r\n\r\n", HPE_INVALID_VERSION);
   test_simple("GET / HTTP/1.01\r\n\r\n", HPE_INVALID_VERSION);
+
+  test_simple("GET / HTTP/1.0\r\nHello: w\1rld\r\n\r\n", HPE_INVALID_HEADER_TOKEN);
+  test_simple("GET / HTTP/1.0\r\nHello: woooo\2rld\r\n\r\n", HPE_INVALID_HEADER_TOKEN);
 
   // Extended characters - see nodejs/test/parallel/test-http-headers-obstext.js
   test_simple("GET / HTTP/1.1\r\n"
